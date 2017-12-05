@@ -30,7 +30,8 @@ class ThreadedClient:
 
     def connectionThread(self, socket, address):
         self.send(socket, "Type 'exit' to end the connection.\n")
-        threading.Thread(target = self.printChat(socket, address)).start()   
+        threading.Thread(target = self.printChat, args = (socket, address)).start()   
+        threading.Thread(target = self.sendChat, args = (socket, )).start()
         # while True:
         #     text = input()
         #     # print ('You:\n', text)
@@ -38,21 +39,23 @@ class ThreadedClient:
 
     def sendChat(self, socket):
         while True:
-            text = input()
+            text = sys.stdin.readline()
             print ('You:\n', text)
             self.send(socket, text)
             
 
-    def printChat(self, socket, address):
+    def printChat(self, sock, address):
         while True:
-            recvChat = self.recv(socket)
+            recvChat = self.recv(sock)
+            if not recvChat:
+                sock.shutdown(socket.SHUT_WR)
             # print(':'+recvChat+':')
             # print(recvChat.split('\n'))
             if recvChat.split('\n')[0] != 'exit\r':
                 print(address, ":\n", recvChat)     
             else:
                 print('Connection closed.')
-                socket.close()
+                sock.close()
                 break
                 
 
