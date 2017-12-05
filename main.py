@@ -21,6 +21,7 @@ class SocketConnection:
 
         threading.Thread(target = self.listen).start()
 
+        #TODO: Request to connect aother friends
         # print( 'To connect with friend type:\nconnect <IP> <PORT>\n')
         # threading.Thread(target = self.conReqListen).start()
 
