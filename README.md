@@ -11,6 +11,6 @@ pip3
 ```
 ### About this project
 This project is split into two of version of folder
-* [Command line version(Only wating for connected)]()
-* [GUI version]()
+* [Command line version(Only wating for connected)](https://github.com/kennaruk/TalkToU/tree/master/version1_command_line)
+* [GUI version](https://github.com/kennaruk/TalkToU/tree/master/version2_gui)
 
