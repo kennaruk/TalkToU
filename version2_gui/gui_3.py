@@ -18,55 +18,57 @@ friendLists = [
 
 class ChatPageGUI:
     def __init__(self, master):
+        self.screenWidth = 50
         self.master = master
         master.title("TalkToU")
 
         Label(master, text=payload).pack()
 
-        ''' frame1 '''
+        ''' Text chat frame '''
         frame = Frame(master)       
         frame.pack()
       
-        self.textArea = Text(frame, height=20, width=50)
-        self.textArea.pack(side=LEFT,  fill=BOTH, expand=True)
-
         scroll = Scrollbar(frame, orient=VERTICAL)        
-        scroll.config (command=self.textArea.yview)
         scroll.pack(side=RIGHT, fill=Y, expand=True)
+      
+        self.textArea = Text(frame, height=20, width=self.screenWidth)
+        self.textArea.pack(side=LEFT,  fill=BOTH, expand=True)
+        self.textArea.tag_configure('recieve', justify='left')
+        self.textArea.tag_configure('send', justify='right')
+        
+        self.textArea.tag_add('recieve', 1.0, 'end')
+        self.textArea.tag_add('send', 2.0, 'end')
 
+        for i in range (10):
+            self.textArea.insert('end', 'senddd\n', ('send'))
+            self.textArea.insert('end', 'recvvv\n', ('recieve'))
+        self.textArea.config(state=DISABLED)
 
-        ''' frame2 '''
+        scroll.config(command=self.textArea.yview)
+        self.textArea.config(yscrollcommand=scroll.set)      
+        
+        ''' Enter message and send frame '''
         frame2 = Frame(master)
-        frame2.pack()
-        ipLbl = Label(frame2, text="      IP: ")
-        ipLbl.pack(side=LEFT)
+        frame2.pack(side=LEFT)
+        messageLbl = Label(frame2, text="Message: ")
+        messageLbl.pack(side=LEFT)
         
-        self.ipEnt = Entry(frame2)
-        self.ipEnt.pack(side=RIGHT)
+        sendBtn = Button(frame2, text="SEND", command=self.sendMessage)
+        sendBtn.pack(side=RIGHT)
 
-        ''' frame3'''
-        frame3 = Frame(master)
-        frame3.pack()
-        portLbl = Label(frame3, text="PORT: ")
-        portLbl.pack(side=LEFT)
+        self.messageEnt = Entry(frame2, width=self.screenWidth-20)
+        self.messageEnt.pack(side=RIGHT)
         
-        self.portEnt = Entry(frame3)
-        self.portEnt.pack(side=RIGHT)
+        self.master.bind('<Return>', self.sendMessage)
 
-        '''End Frame'''
-        startChatBtn = Button(master, text="Start Chat", command=self.startChat)
-        startChatBtn.pack(fill=X)
-    
-    def startChat(self):
-        print(self.select.get(ACTIVE))
-    
-    def onselect(self, evt):
-        selectRow = self.select.get(ACTIVE)
-        ip = StringVar(self.master, selectRow.split(':')[1])
-        self.ipEnt.config(textvariable=ip)
-
-        port = StringVar(self.master, selectRow.split(':')[2])
-        self.portEnt.config(textvariable=port)
+    def sendMessage(self, event=None):
+        msg = self.messageEnt.get()
+        if msg != "":
+            self.messageEnt.delete(0, 'end')
+            self.textArea.config(state=NORMAL)
+            self.textArea.insert('end', msg+'\n', ('send'))
+            self.textArea.config(state=DISABLED)
+            self.textArea.see(END)
 
 root = Tk()
 root.attributes("-topmost", True)
