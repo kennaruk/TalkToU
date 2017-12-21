@@ -1,5 +1,4 @@
 from tkinter import *
-from tusocket import *
 from tkinter import *
 from tkinter import messagebox
 import socket
@@ -17,7 +16,7 @@ friendLists = [
     "5809650756:192.168.1.8:23"
 ]
 
-class ListPageGUI:
+class ChatPageGUI:
     def __init__(self, master):
         self.master = master
         master.title("TalkToU")
@@ -27,16 +26,14 @@ class ListPageGUI:
         ''' frame1 '''
         frame = Frame(master)       
         frame.pack()
-        scroll = Scrollbar(frame, orient=VERTICAL)
       
-        self.select = Listbox(frame, yscrollcommand=scroll.set, height=6, width=30)
-        self.select.bind('<<ListboxSelect>>', self.onselect)
-        for i in range(len(friendLists)):
-            self.select.insert(END, friendLists[i])
-        scroll.config (command=self.select.yview)
+        self.textArea = Text(frame, height=20, width=50)
+        self.textArea.pack(side=LEFT,  fill=BOTH, expand=True)
+
+        scroll = Scrollbar(frame, orient=VERTICAL)        
+        scroll.config (command=self.textArea.yview)
         scroll.pack(side=RIGHT, fill=Y, expand=True)
 
-        self.select.pack(side=LEFT,  fill=BOTH, expand=True)
 
         ''' frame2 '''
         frame2 = Frame(master)
@@ -73,6 +70,6 @@ class ListPageGUI:
 
 root = Tk()
 root.attributes("-topmost", True)
-home_gui = ListPageGUI(root)
+chat_gui = ChatPageGUI(root)
 root.mainloop()
 

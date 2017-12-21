@@ -1,5 +1,4 @@
 from tkinter import *
-from tusocket import *
 from tkinter import *
 from tkinter import messagebox
 import socket
