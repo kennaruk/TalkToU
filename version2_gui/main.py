@@ -103,7 +103,8 @@ class HomePageGUI(Frame):
 
 class ListPageGUI(Toplevel):
     def __init__(self, payload):
-        # self.title("TalkToU")
+        self.payload = payload
+
         Toplevel.__init__(self)
         headerText = payload['user']['USER'] + " " + payload['user']['IP'] + " " + payload['user']['PORT']
         Label(self, text=headerText).pack()
@@ -143,8 +144,23 @@ class ListPageGUI(Toplevel):
         '''End Frame'''
         startChatBtn = Button(self, text="Start Chat", command=self.startChat)
         startChatBtn.pack(fill=X)
-    
+
+        threading.Thread(target=self.listenSocket).start()
+
     def startChat(self):
+        ip_host = self.ipEnt.get()
+        port = int(self.portEnt.get())
+
+        connectionSocket = socket.socket(
+        socket.AF_INET, socket.SOCK_STREAM)
+        connectionSocket.connect((ip_host, port))
+
+        payload = {
+            "connection_socket": connectionSocket,
+            "address": ip_host + " " + str(port)
+        }
+        chatPageGUI = ChatPageGUI(payload)            
+        
         print(self.select.get(ACTIVE))
     
     def onselect(self, evt):
@@ -154,6 +170,106 @@ class ListPageGUI(Toplevel):
 
         port = StringVar(self, selectRow.split(':')[2])
         self.portEnt.config(textvariable=port)
+    
+    def listenSocket(self):
+        listenSocket = socket.socket(
+        socket.AF_INET, socket.SOCK_STREAM)
+        listenSocket.bind((self.payload['user']['IP'], (int)(self.payload['user']['PORT']) ))
+        listenSocket.listen(1)
+        while True:
+            (connectionSocket, address) = listenSocket.accept()
+            print ("Connection from", address)
+            payload = {
+                "connection_socket": connectionSocket,
+                "address": address
+            }
+            chatPageGUI = ChatPageGUI(payload)            
+
+            # threading.Thread(target = self.connection, args = (connectionSocket, address)).start()
+    
+class ChatPageGUI(Toplevel):
+    def __init__(self, payload):
+        self.payload = payload
+        Toplevel.__init__(self)
+        self.master = self
+        master = self
+
+        self.screenWidth = 50
+        master.title("TalkToU")
+
+        Label(master, text=payload['address']).pack()
+
+        ''' Text chat frame '''
+        frame = Frame(master)       
+        frame.pack()
+      
+        scroll = Scrollbar(frame, orient=VERTICAL)        
+        scroll.pack(side=RIGHT, fill=Y, expand=True)
+      
+        self.textArea = Text(frame, height=20, width=self.screenWidth)
+        self.textArea.pack(side=LEFT,  fill=BOTH, expand=True)
+        self.textArea.tag_configure('recieve', justify='left')
+        self.textArea.tag_configure('send', justify='right')
+        
+        self.textArea.tag_add('recieve', 1.0, 'end')
+        self.textArea.tag_add('send', 2.0, 'end')
+
+        # for i in range (10):
+        #     self.textArea.insert('end', 'senddd\n', ('send'))
+        #     self.textArea.insert('end', 'recvvv\n', ('recieve'))
+        self.textArea.config(state=DISABLED)
+
+        scroll.config(command=self.textArea.yview)
+        self.textArea.config(yscrollcommand=scroll.set)      
+        
+        ''' Enter message and send frame '''
+        frame2 = Frame(master)
+        frame2.pack(side=LEFT)
+        messageLbl = Label(frame2, text="Message: ")
+        messageLbl.pack(side=LEFT)
+        
+        sendBtn = Button(frame2, text="SEND", command=self.sendMessage)
+        sendBtn.pack(side=RIGHT)
+
+        self.messageEnt = Entry(frame2, width=self.screenWidth-20)
+        self.messageEnt.pack(side=RIGHT)
+        # self.messageEnt.bind('<Return>', self.sendMessage)
+        
+        threading.Thread(target=self.recieveMessage, args = (self.payload['connection_socket'], self.payload['address'])).start()
+
+    def sendMessage(self, event=None):
+        msg = self.messageEnt.get()+'\n'
+        if msg != "":
+            self.messageEnt.delete(0, 'end')
+            self.textArea.config(state=NORMAL)
+            self.textArea.insert('end', msg, ('send'))
+            self.textArea.config(state=DISABLED)
+            self.textArea.see(END)
+            self.sockSend(self.payload['connection_socket'], msg)
+
+    def recieveMessage(self, sock, address):
+        while True:
+            recv_msg = self.sockRecv(sock)
+            self.textArea.config(state=NORMAL)
+            self.textArea.insert('end', recv_msg, ('recieve'))
+            self.textArea.config(state=DISABLED)
+            self.textArea.see(END)
+            
+
+    def sockSend(self, sock, msg):
+        try:
+            sock.send(bytes(msg, 'utf-8'))
+        except BrokenPipeError:
+            raise BrokenPipeError
+    
+    def sockRecv(self, sock):
+        try:
+            recvMsg = sock.recv(4096).decode()
+            return recvMsg
+        except UnicodeDecodeError:
+            raise UnicodeDecodeError
+        except TypeError:
+            raise TypeError
 
 
 root = Tk()
