@@ -31,7 +31,14 @@ class HomePageGUI(Frame):
         self.ipLbl = Label(master, text="IP: ")
         self.ipLbl.grid(row = 4)
         
-        ip = StringVar(master, value=socket.gethostbyname(socket.gethostname()))
+        hostip = socket.gethostbyname_ex(socket.gethostname())
+        print(hostip)
+        hostip = hostip[len(hostip)-1]
+        print(hostip)        
+        hostip = hostip[len(hostip)-1]
+        print(hostip)
+        
+        ip = StringVar(master, value=hostip)
         self.ipEnt = Entry(master, textvariable=ip, state='disable')
         self.ipEnt.grid(row=4, column=1)
 
@@ -203,7 +210,7 @@ class ChatPageGUI(Toplevel):
         self.screenWidth = 50
         master.title("TalkToU")
 
-        Label(master, text="[Talking to] "+str(payload['address'])).pack()
+        Label(master, text="[Talking to] "+payload['address']).pack()
 
         ''' Text chat frame '''
         frame = Frame(master)       
@@ -212,7 +219,7 @@ class ChatPageGUI(Toplevel):
         scroll = Scrollbar(frame, orient=VERTICAL)        
         scroll.pack(side=RIGHT, fill=Y, expand=True)
       
-        self.textArea = Text(frame, height=13, width=self.screenWidth+20)
+        self.textArea = Text(frame, height=20, width=self.screenWidth)
         self.textArea.pack(side=LEFT,  fill=BOTH, expand=True)
         self.textArea.tag_configure('recieve', justify='left')
         self.textArea.tag_configure('send', justify='right')
