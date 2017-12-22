@@ -32,13 +32,10 @@ class HomePageGUI(Frame):
         self.ipLbl.grid(row = 4)
         
         hostip = socket.gethostbyname_ex(socket.gethostname())
-        print(hostip)
         hostip = hostip[len(hostip)-1]
-        print(hostip)        
-        hostip = hostip[len(hostip)-1]
-        print(hostip)
+        self.hostip = hostip[len(hostip)-1]
         
-        ip = StringVar(master, value=hostip)
+        ip = StringVar(master, value=self.hostip)
         self.ipEnt = Entry(master, textvariable=ip, state='disable')
         self.ipEnt.grid(row=4, column=1)
 
@@ -55,7 +52,7 @@ class HomePageGUI(Frame):
         self.user = {
             'USER': self.usernameEnt.get(),
             'PASS': self.passwordEnt.get(),
-            'IP': socket.gethostbyname(socket.gethostname()),
+            'IP': self.hostip,
             'PORT': self.portEnt.get()
         }
         AUTHEN = "USER:" + self.user['USER'] + "\n" + \
