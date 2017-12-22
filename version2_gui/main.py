@@ -207,7 +207,7 @@ class ChatPageGUI(Toplevel):
         self.screenWidth = 50
         master.title("TalkToU")
 
-        Label(master, text="[Talking to] "+payload['address']).pack()
+        Label(master, text="[Talking to] "+str(payload['address'])).pack()
 
         ''' Text chat frame '''
         frame = Frame(master)       
