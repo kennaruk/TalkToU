@@ -203,7 +203,7 @@ class ChatPageGUI(Toplevel):
         self.screenWidth = 50
         master.title("TalkToU")
 
-        Label(master, text="[Talking to] "+payload['address']).pack()
+        Label(master, text="[Talking to] "+str(payload['address'])).pack()
 
         ''' Text chat frame '''
         frame = Frame(master)       
@@ -212,7 +212,7 @@ class ChatPageGUI(Toplevel):
         scroll = Scrollbar(frame, orient=VERTICAL)        
         scroll.pack(side=RIGHT, fill=Y, expand=True)
       
-        self.textArea = Text(frame, height=20, width=self.screenWidth)
+        self.textArea = Text(frame, height=13, width=self.screenWidth+20)
         self.textArea.pack(side=LEFT,  fill=BOTH, expand=True)
         self.textArea.tag_configure('recieve', justify='left')
         self.textArea.tag_configure('send', justify='right')
