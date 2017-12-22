@@ -22,7 +22,7 @@ class ChatPageGUI:
         self.master = master
         master.title("TalkToU")
 
-        Label(master, text=payload).pack()
+        Label(master, text="[Taling to] 192.168.1.1 95" ).pack()
 
         ''' Text chat frame '''
         frame = Frame(master)       
@@ -56,8 +56,8 @@ class ChatPageGUI:
         sendBtn = Button(frame2, text="SEND", command=self.sendMessage)
         sendBtn.pack(side=RIGHT)
 
-        self.messageEnt = Entry(frame2, width=self.screenWidth-20)
-        self.messageEnt.pack(side=RIGHT)
+        self.messageEnt = Entry(frame2, width=self.screenWidth)
+        self.messageEnt.pack(side=LEFT)
         
         self.master.bind('<Return>', self.sendMessage)
 

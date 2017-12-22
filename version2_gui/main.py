@@ -9,7 +9,7 @@ class HomePageGUI(Frame):
     def __init__(self, master):
         self.serverSocket = socket.socket(
         socket.AF_INET, socket.SOCK_STREAM)
-
+        
         self.master = master
         master.title("TalkToU")
 
@@ -106,15 +106,19 @@ class ListPageGUI(Toplevel):
         self.payload = payload
 
         Toplevel.__init__(self)
-        headerText = payload['user']['USER'] + " " + payload['user']['IP'] + " " + payload['user']['PORT']
-        Label(self, text=headerText).pack()
+        # headerText = payload['user']['USER'] + " " + payload['user']['IP'] + " " + payload['user']['PORT']
+        Label(self, text="TalkToU").pack()        
+        Label(self, text="[Your info] USER: "+payload['user']['USER']).pack()
+        Label(self, text="IP: "+payload['user']['IP'] + " PORT: "+payload['user']['PORT']).pack()
 
+
+        Label(self, text="Friends List", anchor='w').pack(fill='both')        
         ''' frame1 '''
         frame = Frame(self)       
         frame.pack()
         scroll = Scrollbar(frame, orient=VERTICAL)
       
-        self.select = Listbox(frame, yscrollcommand=scroll.set, height=6, width=30)
+        self.select = Listbox(frame, yscrollcommand=scroll.set, height=6, width=50)
         self.select.bind('<<ListboxSelect>>', self.onselect)
         for i in range(len(payload['friendList'])):
             self.select.insert(END, payload['friendList'][i])
@@ -123,6 +127,8 @@ class ListPageGUI(Toplevel):
 
         self.select.pack(side=LEFT,  fill=BOTH, expand=1)
 
+
+        Label(self, text="Fill friend info").pack()
         ''' frame2 '''
         frame2 = Frame(self)
         frame2.pack()
@@ -197,7 +203,7 @@ class ChatPageGUI(Toplevel):
         self.screenWidth = 50
         master.title("TalkToU")
 
-        Label(master, text=payload['address']).pack()
+        Label(master, text="[Talking to] "+payload['address']).pack()
 
         ''' Text chat frame '''
         frame = Frame(master)       
@@ -231,7 +237,7 @@ class ChatPageGUI(Toplevel):
         sendBtn = Button(frame2, text="SEND", command=self.sendMessage)
         sendBtn.pack(side=RIGHT)
 
-        self.messageEnt = Entry(frame2, width=self.screenWidth-20)
+        self.messageEnt = Entry(frame2, width=self.screenWidth)
         self.messageEnt.pack(side=RIGHT)
         # self.messageEnt.bind('<Return>', self.sendMessage)
         
@@ -271,8 +277,15 @@ class ChatPageGUI(Toplevel):
         except TypeError:
             raise TypeError
 
+def center(root):
+    root.update_idletasks()
+    x = (root.winfo_screenwidth() - root.winfo_reqwidth()) / 2
+    y = (root.winfo_screenheight() - root.winfo_reqheight()) / 2
+    root.geometry("+%d+%d" %  (x, y))
 
 root = Tk()
+center(root)
+
 root.attributes("-topmost", True)
 home_gui = HomePageGUI(root)
 root.mainloop()
